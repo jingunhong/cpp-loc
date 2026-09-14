@@ -5,7 +5,8 @@ import json
 import shutil
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from itertools import batched
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -131,6 +132,19 @@ def runner_row(row: dict, *, enriched: bool = True) -> dict:
     return result
 
 
+def enrich_batch(task):
+    """Keep Git subprocess work in small workers instead of the full-corpus process."""
+    name, rows, repos_dir, revision, reports_only = task
+    sources = REPOS[name]["sources"](repos_dir / "cache", None)
+    for source in sources:
+        source.offline = True
+    result = [
+        integrity.enrich(row, repos_dir / name, revision, sources, reports_only=reports_only)
+        for row in rows
+    ]
+    return result, {key: value for source in sources for key, value in source.consumed.items()}
+
+
 def enrich_command(args) -> None:
     code = implementation()
     cfg = REPOS[args.repo]
@@ -164,22 +178,35 @@ def enrich_command(args) -> None:
     fresh(args.out)
 
     def run(row):
-        enriched = integrity.enrich(row, clone, revision, sources, reports_only=args.reports_only)
-        if not args.reports_only and row["fix_commit"] not in reachable:
-            ev = splits.evidence(enriched)
-            ev["git"]["errors"].append("fix_outside_pinned_upstream")
-            ev["eligibility"] = integrity.eligibility(enriched, ev)
-        return enriched
+        return integrity.enrich(row, clone, revision, sources, reports_only=args.reports_only)
 
-    with ThreadPoolExecutor(args.workers) as pool:
-        result = []
-        for n, row in enumerate(pool.map(run, rows), 1):
-            result.append(row)
-            if n % 500 == 0:
-                print(f"{args.repo}: enriched {n}/{len(rows)}", file=sys.stderr, flush=True)
+    result, payloads = [], {}
+    if args.processes:
+        tasks = (
+            (args.repo, chunk, args.repos_dir, revision, args.reports_only)
+            for chunk in batched(rows, 250, strict=False)
+        )
+        with ProcessPoolExecutor(args.workers) as pool:
+            for chunk, consumed in pool.map(enrich_batch, tasks, buffersize=args.workers * 2):
+                result.extend(chunk)
+                payloads.update(consumed)
+                print(
+                    f"{args.repo}: enriched {len(result)}/{len(rows)}", file=sys.stderr, flush=True
+                )
+    else:
+        with ThreadPoolExecutor(args.workers) as pool:
+            for n, row in enumerate(pool.map(run, rows, buffersize=args.workers * 2), 1):
+                result.append(row)
+                if n % 500 == 0:
+                    print(f"{args.repo}: enriched {n}/{len(rows)}", file=sys.stderr, flush=True)
+        payloads = {key: value for src in sources for key, value in src.consumed.items()}
+    for row in result:
+        if not args.reports_only and row["fix_commit"] not in reachable:
+            ev = splits.evidence(row)
+            ev["git"]["errors"].append("fix_outside_pinned_upstream")
+            ev["eligibility"] = integrity.eligibility(row, ev)
     result.sort(key=lambda r: r["instance_id"])
     grouped = splits.groups(result)
-    payloads = {key: value for src in sources for key, value in src.consumed.items()}
     snapshot = {
         "implementation": code,
         "repository": cfg["upstream"],
@@ -476,6 +503,11 @@ def main() -> None:
             cmd.add_argument("--repos-dir", type=Path, default=Path("repos"))
             if name == "enrich":
                 cmd.add_argument("--workers", type=int, default=4)
+                cmd.add_argument(
+                    "--processes",
+                    action="store_true",
+                    help="use bounded process batches for large corpora",
+                )
             cmd.add_argument("--offline", action="store_true", required=True)
         if name == "enrich":
             cmd.add_argument("--reports-only", action="store_true")

@@ -349,3 +349,9 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   matching rows with recorded IDs/reasons instead of editing frozen text. Retain source
   links and hashes. This screen can have false positives and does not certify anonymity
   or redistribution rights; private visibility must be checked before and after upload.
+- Linux's 63,115-row enrichment exposed process-launch overhead from a large threaded
+  Python process. Add optional `--processes` with bounded 250-row tasks and local
+  worker caches; merge all evidence before grouping. The thread backend remains
+  available with a bounded queue. A fixture verifies byte-identical evidence/manifests,
+  cached payload accounting, cache misses, and pinned-upstream exclusions across both
+  backends. No eligibility rules or historical rows change.

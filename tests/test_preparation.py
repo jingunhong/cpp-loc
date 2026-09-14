@@ -49,6 +49,68 @@ def cache_payload(src, ref, payload):
     src.cache_path(ref).write_text(json.dumps(payload), encoding="utf-8")
 
 
+def test_process_enrichment_matches_threads_with_cached_reports_and_missing_refs(
+    synthetic_repo, tmp_path, monkeypatch
+):
+    from types import SimpleNamespace
+
+    from scripts import prepare
+
+    repo, shas = synthetic_repo
+    clones = tmp_path / "clones"
+    clones.mkdir()
+    (clones / "llvm").symlink_to(repo, target_is_directory=True)
+    src = reports.GitHub(clones / "cache", "llvm/llvm-project", None)
+    cache_payload(
+        src,
+        "1",
+        {
+            "title": "Bug: crash",
+            "body": "drivers/foo.c crashes",
+            "labels": [],
+            "number": 1,
+            "html_url": "https://github.com/llvm/llvm-project/issues/1",
+        },
+    )
+    row = asdict(
+        make(
+            repo="llvm/llvm-project",
+            base_commit=shas["initial"],
+            fix_commit=shas["fix"],
+            problem_statement="Bug: crash\n\ndrivers/foo.c crashes",
+            metadata={"report_refs": {"github_issue": ["1", "2"]}},
+        )
+    )
+    source = tmp_path / "inputs"
+    source.mkdir()
+    write_rows(source, "instances", [row])
+    # The fix exists locally but is deliberately outside the pinned upstream revision.
+    (source / "COMMAND.txt").write_text("upstream HEAD: " + shas["initial"] + "\n")
+    monkeypatch.setattr(prepare, "implementation", lambda: {"revision": "same-code"})
+    for mode in (False, True):
+        prepare.enrich_command(
+            SimpleNamespace(
+                repo="llvm",
+                input=source,
+                out=tmp_path / str(mode),
+                repos_dir=clones,
+                reports_only=False,
+                workers=2,
+                processes=mode,
+            )
+        )
+    assert file_hashes(tmp_path / "False") == file_hashes(tmp_path / "True")
+    enriched = prepare.load_rows(tmp_path / "True", "records-*.jsonl")[0]
+    evidence = splits.evidence(enriched)
+    assert "fix_outside_pinned_upstream" in evidence["eligibility"]["excluded"]
+    assert evidence["reports"]["selected"] is not None
+    assert {r["state"] for r in evidence["reports"]["references"]} == {
+        "report",
+        "offline_cache_miss",
+    }
+    assert len(prepare.load_rows(tmp_path / "True", "payloads-*.jsonl")) == 1
+
+
 def test_messages_reverts_roots_and_filename_boundaries(synthetic_repo):
     message = (
         "subj\n\nRevert the temporary option before retrying.\n\n"
