@@ -6,6 +6,15 @@ or a determination that the dataset is unlawful. Hugging Face write access is ve
 `jingunhong/cpp-loc` is an empty private placeholder with no dataset files uploaded.
 Evidence paths below refer to the original `Cpp-SWE-bench` checkout.
 
+The user subsequently authorized **private review storage**, with the public-release
+review deferred. `scripts/package_private.py` prepares a separate runner-only copy of
+a verified local bundle: it withholds phone/credential-pattern rows, preserves retained
+text and source links, and leaves raw companions local. Its manifest records the screen,
+counts, exclusions, and parent hashes. The screen covers all runner fields, but names,
+email addresses, home paths, and other personal information may remain. Private access
+is a storage decision, not clearance for public redistribution. Verify actual Hub
+visibility before upload; `hf upload --private` alone does not change an existing repo.
+
 ## Evidence found locally
 
 A reproducible pattern screen of all 18,216 v2 report-backed rows flags email-like

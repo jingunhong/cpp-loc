@@ -331,3 +331,21 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   and existing manifests retain their original implementation revisions and hashes.
 - GitHub code delivery can proceed independently of the dataset's unresolved privacy
   and redistribution review. Hugging Face remains an empty private placeholder.
+
+## 2026-09-14 — six-source preparation and private review storage
+
+- Extend full offline enrichment, grouping, temporal validation, and the report-only
+  baseline to the existing Linux, systemd, PostgreSQL, and QEMU populations. Preserve
+  older report-only annotations and all v0/v1/v2 artifacts. Use new `v3.1`, `splits-v2`,
+  `diagnostic-v2`, and `baseline-v1` directories for these four sources.
+- Keep LLVM as the adaptation source. Freeze the other four sources as evaluation-only
+  candidates before measuring their baselines, using the same UTC boundaries and
+  explicit test end `2026-09-09T00:00:00Z`. Do not manufacture train/dev sets or relax
+  chronology when a source has insufficient evidence.
+- The user authorized private Hugging Face storage while deferring the remaining
+  public-release privacy/IP review. Prepare a separate runner-only private review copy;
+  retain raw messages, mail, patches, caches, and full evidence locally. Apply the
+  existing phone/credential patterns to every serialized runner field, withholding
+  matching rows with recorded IDs/reasons instead of editing frozen text. Retain source
+  links and hashes. This screen can have false positives and does not certify anonymity
+  or redistribution rights; private visibility must be checked before and after upload.
