@@ -195,6 +195,23 @@ gold; eligibility metadata refers to the enriched primary-file projection. Basel
 summaries describe the original populations before this storage filter. The exporter
 does not implement the separate runner's runtime isolation.
 
+Delivery verified on 2026-09-14: Hub commit
+[`528bffec7602b48d4ad4687d5735a61af8a7718c`](https://huggingface.co/datasets/jingunhong/cpp-loc/commit/528bffec7602b48d4ad4687d5735a61af8a7718c)
+is **private**. All 24 uploaded files (127,353,501 bytes) match the local content
+hashes; the only additional remote file is the pre-existing `.gitattributes`.
+The Hub accepted the card metadata, all 13 configurations loaded locally through
+`datasets`, and authenticated loading of `linux_strict/test` from the pinned Hub
+revision returned the expected 105 exact five-field rows. Every retained instance
+has matching compact provenance, the storage screen has no remaining high-risk
+pattern matches, and split group separation is preserved.
+
+The private export was produced at `2c6db4d`; its `release.json` SHA-256 is
+`d73ad6f5d63545c402ead475feb522e26a80d33f7a733f4c2fa86f9cb05bc2c5`.
+Local verification receipts are
+`releases/six-repo-20260914/{private-v2-verification,hf-delivery}.json`.
+These checks establish delivery and the stated screening scope, not public-release
+privacy or intellectual-property clearance.
+
 Public privacy/IP review remains open: source-specific redistribution rights, embedded
 code notices/attribution, personal-data treatment and basis, and a contact/removal
 process. The code's MIT license supplies no blanket dataset license. Private access
