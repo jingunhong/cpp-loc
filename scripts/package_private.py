@@ -126,7 +126,7 @@ def package(bundle: Path, out: Path) -> dict:
     metadata.update(
         configs=configs,
         license_name="upstream-rights-review-pending",
-        license_link="README.md#rights-and-access",
+        license_link="https://huggingface.co/datasets/jingunhong/cpp-loc#rights-and-access",
     )
     card = "---\n" + json.dumps(metadata, indent=2) + "\n---\n\n# cpp-loc\n\n"
     card += (

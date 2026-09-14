@@ -162,9 +162,14 @@ and unavailable full-diff patch IDs remain evidence limitations, not uniqueness 
 ## Private review delivery
 
 The full local bundle is `releases/cpp-loc-review-v3/`. The separate private storage
-copy is `releases/cpp-loc-private-review-v1/`, destined for
+copy is `releases/cpp-loc-private-review-v2/`, destined for
 [`jingunhong/cpp-loc`](https://huggingface.co/datasets/jingunhong/cpp-loc).
 The local bundle is not the upload payload.
+
+The first private package passed all local content/loader checks but Hub card
+validation rejected its relative license-review link. The exporter now emits an
+HTTPS link. That local-only v1 attempt is retained; v2 regenerates the card and
+release hashes from the same parent bundle without changing any retained row.
 
 The screen withholds five unique historical rows (two phone-context rows and three
 credential-shaped examples), retaining **18,211** unique report-backed instances: LLVM 8,357,

@@ -425,7 +425,7 @@ def package_command(args) -> None:
         "language": ["en", "code"],
         "license": "other",
         "license_name": "upstream-project-licenses",
-        "license_link": "README.md#licenses",
+        "license_link": "https://github.com/jingunhong/cpp-loc/blob/main/docs/04-publication-review.md",
         "pretty_name": "cpp-loc",
         "tags": ["code-localization", "cpp", "c", "bug-reports"],
         "configs": configs,

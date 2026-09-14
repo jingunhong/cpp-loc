@@ -359,3 +359,8 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   examples from a serialized-text scan. `publication-screen-2` recursively scans
   decoded string values, including nested file labels and companion evidence. The
   export regression now checks that double-quoted credentials are withheld too.
+- Hub card validation requires an HTTPS `license_link`; relative README anchors
+  were rejected before upload. Both package exporters now emit absolute HTTPS
+  review links, with a regression assertion in the existing private-export check.
+  Preserve the first private attempt locally and regenerate a new private v2 copy
+  from the same research bundle. No runner rows or source evidence change.

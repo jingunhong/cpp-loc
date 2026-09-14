@@ -53,6 +53,8 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
     before = file_hashes(bundle)
     monkeypatch.setattr(package_private, "implementation", lambda: {"revision": "committed"})
     result = package_private.package(bundle, out)
+    card = json.loads((out / "README.md").read_text().split("---", 2)[1])
+    assert card["license_link"].startswith("https://")  # Hub metadata requires an HTTPS URI.
     assert result["withheld"] == {
         "key": ["github_token_shape"],
         "phone": ["phone_context"],
