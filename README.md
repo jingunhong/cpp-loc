@@ -6,10 +6,10 @@ report-only path baselines.
 
 This GitHub repository contains the implementation, tests, configuration, and
 documentation. Corpora, intermediate results, upstream clones, API caches, and
-release drafts belong in local storage. The intended dataset destination is
+release drafts belong in local storage. The dataset destination is
 [`jingunhong/cpp-loc` on Hugging Face](https://huggingface.co/datasets/jingunhong/cpp-loc);
-it currently has an empty private placeholder. Full-text publication is held for
-the [privacy and redistribution review](docs/04-publication-review.md).
+access is restricted to private review. Public release remains held for the
+[privacy and redistribution review](docs/04-publication-review.md).
 
 ## Setup
 
@@ -64,15 +64,27 @@ temporally verified benchmark. The complete historical report-backed corpus has
 |---|---:|---:|---:|---:|
 | LLVM | 8,357 | 5,330 | 300 | 1,059 |
 | ClickHouse | 1,022 | — | — | 397 |
+| Linux | 5,424 | — | — | 382 |
+| systemd | 1,418 | — | — | 73 |
+| PostgreSQL | 1,318 | — | — | 171 |
+| QEMU | 677 | — | — | 20 |
 
-Neither repository currently yields a nonempty strict future evaluation split.
-The report-only baseline achieved macro F1 of 13.1% for LLVM and 22.2% for
-ClickHouse across their full report-backed populations. Eligibility and uncertainty
-remain explicit; unknown chronology is never relaxed to obtain a split.
+Linux also yields **105 strict-rule future test candidates**; the other repositories
+have empty strict future tests (LLVM refuses its strict adaptation configuration).
+These remain rule-based candidates requiring source review, not a certified benchmark.
+Baseline results, exclusions, and reproducibility checks for all six are in the
+[six-source report](docs/06-six-source-validation.md). Unknown chronology is never
+relaxed to obtain a split.
+
+The private storage copy withholds five flagged historical rows, retaining 18,211
+unique report-backed instances. None of those five appears in the diagnostic or
+strict splits above.
+The historical and diagnostic views overlap and must not be summed as distinct bugs.
 
 - [Integrity and evidence rules](docs/01-dataset-integrity.md)
 - [Grouping, temporal splits, and runner handoff](docs/02-splits-and-provenance.md)
 - [Measured validation and exclusion counts](docs/03-validation-report.md)
+- [Full six-source follow-up and private review export](docs/06-six-source-validation.md)
 - [Publication review and remaining work](docs/04-publication-review.md)
 - [Agent review of seeded source samples](docs/05-agent-audit.md)
 - [Decision and migration history](docs/decisions.md)
@@ -85,4 +97,5 @@ and revisions; a new code repository does not change their provenance.
 
 The implementation is [MIT-licensed](LICENSE). That license does not relicense
 upstream report text, mail, patches, or code snippets. Dataset redistribution terms,
-required notices, and privacy treatment must be established separately before upload.
+required notices, and privacy treatment require a separate review. Private hosting
+does not itself resolve those obligations.

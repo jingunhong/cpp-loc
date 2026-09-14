@@ -143,3 +143,40 @@ known false negatives in the conservative task heuristics. Diagnostics intention
 retain unknowns, so their counts must not be described as verified bugs. Public release
 also needs review of names, obfuscated contact details, and embedded third-party notices;
 the private storage screen is not a replacement for that review.
+
+## Linux full-enrichment follow-up
+
+The agent inspected all 20 seeded Linux cases, including report excerpts, source-kind
+and task evidence, full change statuses, and chronology. All 20 cached
+payload/text/raw-text checks and independent full-tree baseline comparisons passed;
+evidence is in `releases/six-repo-20260914/linux-verification.json`.
+No reproducer was run, and the observations below do not establish bug causality.
+
+| Linux instance | Agent judgment |
+|---|---|
+| `linux__1c06aff9b82f` | Smatch double-unlock report names the modified USB serial source; immutable mail timing supports local strict eligibility. |
+| `linux__1ff95eb2bebd` | RISC-V boot/SSH failure report is title-only; an added implementation and multiple references support exclusion. syzbot text timing remains unknown. |
+| `linux__3f7c9f9c36b4` | Automated build warning names interrupt helpers; added target source prevents existing-file eligibility despite supported mail timing. |
+| `linux__52266f1015a8` | LoongArch BPF JIT failure includes command output. Ordinary/unknown classification is a conservative false negative; mail timing alone cannot certify report provenance. |
+| `linux__738e6f32e61d` | IOMMUFD use-after-free report describes fuzzing and source context; local strict rules pass. The fixing-message assistance marker is separate from report provenance. |
+| `linux__93ecd4fbad16` | Patch acknowledgement with test/review trailers supplies little original problem description; reply/provenance uncertainty is warranted. |
+| `linux__9ad648017b18` | Missing-header build failure has an embedded prior patch subject. The patch-submission heuristic is overbroad here; multiple-reference ambiguity independently excludes it. |
+| `linux__b120e4432f9f` | IPv6 GRE out-of-bounds stack trace is a real diagnostic artifact; multiple reports and unknown selected syzbot text timing prevent strict use. |
+| `linux__b81c688426a9` | ARM64 page-range warning has source hints, but multiple references and unknown syzbot text timing remain unresolved. |
+| `linux__bdd39576bf50` | Bridge netlink warning contains a detailed trace; multiple-report exclusion and unknown consumed version remain appropriate. |
+| `linux__c96573c0d75d` | NFS cache-overrun reply quotes implementation code. It is useful diagnostic text, but original-report provenance and task evidence remain unresolved. |
+| `linux__d01103fdcb87` | Unsupported network-card revision request carries explicit feature evidence; feature exclusion is supported despite known issue timing. |
+| `linux__d35df77707bf` | SPI NOR boot-loop report includes a proposed diff. Ordinary/unknown heuristics miss defect-like content and demonstrate that retained reports can embed patches. |
+| `linux__e19d7f7e92e0` | Short acknowledgement replies to a bug-report subject. Bug-like title evidence does not turn the reply into an original report. |
+| `linux__eb4573cf2fd8` | USB-C initialization timeout has bug evidence, but the current Bugzilla version and extra references are unresolved. A later resource update does not prove a body edit. |
+| `linux__ee70999a988b` | NILFS diagnostic names source locations; multiple reports remain ambiguous, and report creation does not date the selected syzbot crash text. |
+| `linux__f4af41bf177a` | kexec logging regression discussion embeds an earlier patch subject. Patch-submission classification is an overbroad heuristic, not verified submission provenance. |
+| `linux__f4e19e595cc2` | Overlayfs null-dereference report has reproduction steps and pre-fix resource-update evidence. Local strict eligibility does not itself establish future-test membership. |
+| `linux__fd8c35a92910` | NUMA patch-review reply identifies possible behavior bugs; original-report provenance stays unresolved despite supported mail timing. |
+| `linux__ffdd2bc37895` | AF_ALG vulnerability report is defect-like but missed by conservative title rules. Documentation changes are outside the primary source projection; vulnerability claims were not independently validated. |
+
+The 105 Linux strict-rule future candidates comprise 98 lore reports and seven
+Bugzilla reports. This targeted 20-case review is not an exhaustive review of those
+105 candidates. All 1,809 selected syzbot reports retain unknown consumed-text timing;
+their creation dates are not substituted for crash-version evidence. Heuristic
+limitations above are documented separately rather than hand-correcting frozen rows.

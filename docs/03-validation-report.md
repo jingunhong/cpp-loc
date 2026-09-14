@@ -4,6 +4,12 @@ This report records preparation in the original `Cpp-SWE-bench` checkout. Its
 producing commits and local artifacts remain there; the implementation subsequently
 moved to `cpp-loc`. See the [migration record](decisions.md#2026-09-14--code-repository-migration).
 
+This is the **initial focused pass**, retained as a historical record. The later
+[six-source follow-up](06-six-source-validation.md) extends full Git enrichment,
+splits, and baselines to Linux, systemd, PostgreSQL, and QEMU and documents the
+separate private review export. Counts and no-upload statements below describe
+the initial pass, not the current delivery status.
+
 Measured offline on 2026-09-14. The reviewed checkout was
 `362a920de99d95e16b4935877dd0f3e36998eb0d`, with no pre-existing working changes;
 its original 38 tests passed. The implementation now has **73 passing tests**, plus

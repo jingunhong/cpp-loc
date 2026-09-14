@@ -3,7 +3,9 @@
 Status: **hold the full-text public upload pending review** (2026-09-14).
 This is an engineering risk assessment using published policies, not legal advice
 or a determination that the dataset is unlawful. Hugging Face write access is verified;
-`jingunhong/cpp-loc` is an empty private placeholder with no dataset files uploaded.
+`jingunhong/cpp-loc` is reserved for private review storage. It began as an empty
+private placeholder; the [six-source follow-up](06-six-source-validation.md)
+records the screened release and validation.
 Evidence paths below refer to the original `Cpp-SWE-bench` checkout.
 
 The user subsequently authorized **private review storage**, with the public-release
@@ -17,13 +19,19 @@ email addresses, home paths, and other personal information may remain. Private 
 is a storage decision, not clearance for public redistribution. Verify actual Hub
 visibility before upload; `hf upload --private` alone does not change an existing repo.
 
+The old `jingunhong/Cpp-SWE-bench` GitHub repository was also found to be public
+on 2026-09-14, with historical dataset files in its history. Private Hugging Face
+storage does not change that existing exposure. A separate owner decision about
+the old repository's visibility is pending; the new `cpp-loc` GitHub repository
+contains code and documentation only.
+
 ## Evidence found locally
 
 A reproducible pattern screen of all 18,216 v2 report-backed rows flags email-like
 strings, home directories, IPv4-like strings, two URL credentials, one AWS access-key
 shape, and two phone-context rows. Counts are instance counts and overlap. They are
 not counts of unique people, confirmed credentials, or confirmed legal violations.
-The scanner never emits matched values; raw data remains local and unchanged.
+The scanner never emits matched values and leaves the original local data unchanged.
 
 | Repository | Reports | Email-like | Home path | Phone context | URL credentials | AWS key shape |
 |---|---:|---:|---:|---:|---:|---:|
@@ -113,9 +121,10 @@ jurisdiction. Seek qualified advice if these rights/bases remain unresolved.
 
 The remaining work is:
 
-1. **Fix the public payload.** The current draft includes raw evidence and companions.
-   Keeping those local and publishing only reviewed runner fields and a minimal
-   provenance manifest would reduce exposure; report text still needs review.
+1. **Approve the public payload.** The complete local research bundle includes raw
+   evidence and companions. The separate private copy omits those dedicated fields
+   and retains screened runner rows and compact provenance. Report text, including
+   quoted mail and embedded code, still needs public-release review.
 2. **Complete the privacy review for that payload.** Screen every field, including
    patches and null-report companions if included. Resolve the confirmed contact
    signatures and credential-shaped cases in context, then document what is retained,
@@ -127,7 +136,7 @@ The remaining work is:
 4. **Build and verify a new release version.** Apply the agreed policy reproducibly,
    keep raw evidence local, recompute hashes and eligibility/localization impact, and
    review the final files. Include the resulting license/notice inventory, dataset
-   card, and a contact/removal process before uploading.
+   card, and a contact/removal process before public release.
 
 The current full-text corpus and raw companions are **not cleared for upload as-is**.
 Keep the complete research evidence local. Before a full-text release, establish
