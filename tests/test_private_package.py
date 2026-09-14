@@ -24,6 +24,7 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
     rows.append(
         {**rows[0], "instance_id": "key", "file_changes": [{"file": "ghp_" + "a" * 36 + ".c"}]}
     )
+    rows.append({**rows[0], "instance_id": "password", "problem_statement": 'password="example"'})
     paths = write_rows(corpus, "reports", rows)
     evidence = bundle / "companions/demo/v3.1"
     evidence.mkdir(parents=True)
@@ -45,11 +46,15 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
     before = file_hashes(bundle)
     monkeypatch.setattr(package_private, "implementation", lambda: {"revision": "committed"})
     result = package_private.package(bundle, out)
-    assert result["withheld"] == {"key": ["github_token_shape"], "phone": ["phone_context"]}
+    assert result["withheld"] == {
+        "key": ["github_token_shape"],
+        "phone": ["phone_context"],
+        "password": ["literal_credential_context"],
+    }
     assert result["retained_unique_instances"] == 1
     for name in ("demo_unfiltered", "demo_diagnostic"):
         assert load_rows(out / "data" / name, "*.jsonl") == rows[:1]
-        assert result["counts"][name]["test"] == {"included": 1, "withheld": 2}
+        assert result["counts"][name]["test"] == {"included": 1, "withheld": 3}
     assert not (out / "companions").exists()
     assert "LOCAL RAW EVIDENCE" not in "".join(p.read_text() for p in out.rglob("*") if p.is_file())
     assert (

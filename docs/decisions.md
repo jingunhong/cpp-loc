@@ -355,3 +355,7 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   available with a bounded queue. A fixture verifies byte-identical evidence/manifests,
   cached payload accounting, cache misses, and pinned-upstream exclusions across both
   backends. No eligibility rules or historical rows change.
+- Private-export verification exposed JSON escaping hiding double-quoted credential
+  examples from a serialized-text scan. `publication-screen-2` recursively scans
+  decoded string values, including nested file labels and companion evidence. The
+  export regression now checks that double-quoted credentials are withheld too.

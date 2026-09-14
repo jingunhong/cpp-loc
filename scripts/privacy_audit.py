@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cpp_loc.provenance import json_bytes, sha256  # noqa: E402
 
-RULE = "publication-screen-1"
+RULE = "publication-screen-2"
 PATTERNS = {
     "email_like": re.compile(r"\b[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
     "personal_home_path": re.compile(r"(?:/(?:home|Users)/[^\s/]+/|[A-Za-z]:\\Users\\[^\s\\]+\\)"),
@@ -40,6 +40,22 @@ def flags(text: str) -> dict:
     }
 
 
+def record_flags(value) -> dict:
+    """Scan decoded strings so JSON escaping cannot hide quotes or line breaks."""
+    if isinstance(value, str):
+        return flags(value)
+    result = Counter()
+    if isinstance(value, dict):
+        values = value.values()
+    elif isinstance(value, list):
+        values = value
+    else:
+        return {}
+    for item in values:
+        result.update(record_flags(item))
+    return dict(result)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="+", type=Path)
@@ -60,9 +76,9 @@ def main() -> None:
                 fields = {"problem_statement": row["problem_statement"]}
                 ev = row.get("metadata", {}).get("integrity", {})
                 if ev:
-                    fields["companion_evidence"] = json.dumps(ev, ensure_ascii=False)
+                    fields["companion_evidence"] = ev
                 for field, text in fields.items():
-                    matched = flags(text)
+                    matched = record_flags(text)
                     if matched:
                         findings.append(
                             {

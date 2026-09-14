@@ -13,7 +13,7 @@ from cpp_loc.integrity import normalized_path  # noqa: E402
 from cpp_loc.provenance import sha256  # noqa: E402
 from cpp_loc.schema import validate_runner  # noqa: E402
 from scripts.prepare import file_hashes, fresh, implementation, write_json, write_rows  # noqa: E402
-from scripts.privacy_audit import RULE, flags  # noqa: E402
+from scripts.privacy_audit import RULE, record_flags  # noqa: E402
 
 QUARANTINE = {
     "phone_context",
@@ -55,7 +55,7 @@ def package(bundle: Path, out: Path) -> dict:
                         if errors := validate_runner(row, exact=True):
                             raise ValueError(f"invalid runner row: {errors}")
                         inst = row["instance_id"]
-                        matches = flags(json.dumps(row, ensure_ascii=False))
+                        matches = record_flags(row)
                         screened[inst] = sorted(matches)
                         reasons = sorted(matches.keys() & QUARANTINE)
                         if reasons:
@@ -94,7 +94,7 @@ def package(bundle: Path, out: Path) -> dict:
                     "processed_text_sha256": sha256(row["problem_statement"]),
                     "payload_sha256": (selected.get("payload") or {}).get("sha256"),
                 }
-                if flags(json.dumps(source, ensure_ascii=False)).keys() & QUARANTINE:
+                if record_flags(source).keys() & QUARANTINE:
                     raise ValueError(f"source link requires review: {inst}")
                 sources[inst] = source
     if set(sources) != retained:
@@ -145,7 +145,7 @@ def package(bundle: Path, out: Path) -> dict:
         "parent_release_sha256": sha256((bundle / "release.json").read_bytes()),
         "screen_rule": RULE,
         "quarantine_categories": sorted(QUARANTINE),
-        "screen_scope": "all serialized fields of every exported runner row and source link",
+        "screen_scope": "all decoded string values of every exported runner row and source link",
         "screened_unique_instances": len(screened),
         "retained_unique_instances": len(retained),
         "flagged_unique_instances": dict(Counter(k for hits in screened.values() for k in hits)),
