@@ -11,8 +11,10 @@ or reproducer execution is included.
 
 All six populations use their complete original v2 extraction inputs, including
 null reports for grouping: 78,246 candidates and 18,216 report-backed instances.
-Original v0/v1/v2 files remain unchanged. Local paths below are relative to the
-original `Cpp-SWE-bench` checkout; this code repository contains no corpus files.
+Original v0/v1/v2 files remain unchanged. Artifact paths below are relative to the
+private research archive and require authorized access; this code repository contains
+no corpus files. Pre-migration revisions identify archived provenance, not commits
+available in this public repository's history.
 
 LLVM remains the adaptation candidate. ClickHouse retains its provisional transfer
 evaluation role. The four additional sources were assigned evaluation-only roles
@@ -142,17 +144,19 @@ Existing LLVM/ClickHouse revisions remain recorded in their frozen manifests.
 The process and thread backends produce identical fixture artifacts and use the same
 eligibility rules. Every package records the committed implementation and file hashes.
 
-Example replay from the code repository, using fresh output directories:
+Example replay from the code repository with an authorized local archive copy,
+using fresh output directories. Set the archive location to match your filesystem:
 
 ```sh
+CPP_LOC_ARCHIVE=/path/to/local/research-archive
 uv run python scripts/prepare.py enrich --repo systemd \
-  --input ../Cpp-SWE-bench/data/systemd/v2 --out data/systemd/replay-v3 \
-  --repos-dir ../Cpp-SWE-bench/repos --offline --workers 8
+  --input "$CPP_LOC_ARCHIVE/data/systemd/v2" --out data/systemd/replay-v3 \
+  --repos-dir "$CPP_LOC_ARCHIVE/repos" --offline --workers 8
 uv run python scripts/prepare.py split --input data/systemd/replay-v3 \
   --out data/systemd/replay-diagnostic --view diagnostic --role evaluation-only \
   --test-end 2026-09-09T00:00:00Z
 uv run python scripts/prepare.py audit --repo systemd --input data/systemd/replay-v3 \
-  --out data/systemd/replay-baseline --repos-dir ../Cpp-SWE-bench/repos --offline
+  --out data/systemd/replay-baseline --repos-dir "$CPP_LOC_ARCHIVE/repos" --offline
 ```
 
 Manifests include the producing revision: byte-identical manifest replay requires

@@ -1,12 +1,13 @@
 # 04 — Publication privacy and licensing review
 
-Status: **hold the full-text public upload pending review** (2026-09-14).
+Status: **hold the full-text public upload pending review** (updated 2026-09-15).
 This is an engineering risk assessment using published policies, not legal advice
 or a determination that the dataset is unlawful. Hugging Face write access is verified;
 `jingunhong/cpp-loc` is reserved for private review storage. It began as an empty
 private placeholder; the [six-source follow-up](06-six-source-validation.md)
 records the screened release and validation.
-Evidence paths below refer to the original `Cpp-SWE-bench` checkout.
+Evidence paths below are relative to the private research archive and require
+authorized access; they are not files distributed with this code repository.
 
 The user subsequently authorized **private review storage**, with the public-release
 review deferred. `scripts/package_private.py` prepares a separate runner-only copy of
@@ -19,11 +20,10 @@ email addresses, home paths, and other personal information may remain. Private 
 is a storage decision, not clearance for public redistribution. Verify actual Hub
 visibility before upload; `hf upload --private` alone does not change an existing repo.
 
-The old `jingunhong/Cpp-SWE-bench` GitHub repository was also found to be public
-on 2026-09-14, with historical dataset files in its history. Private Hugging Face
-storage does not change that existing exposure. A separate owner decision about
-the old repository's visibility is pending; the new `cpp-loc` GitHub repository
-contains code and documentation only.
+The owner made the historical data repository private; its private visibility was
+verified on 2026-09-15. The code-only `jingunhong/cpp-loc` GitHub repository remains
+public. The archive's access restriction is complete; the public-release content
+review below remains open.
 
 ## Evidence found locally
 

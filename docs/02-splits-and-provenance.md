@@ -1,8 +1,8 @@
 # 02 — Groups, temporal splits, baseline, and runner handoff
 
-The frozen artifacts referenced below remain in the original `Cpp-SWE-bench`
-checkout. See the [migration usage examples](../README.md#use-the-existing-local-corpus)
-for running this repository's tooling against those external inputs.
+The frozen artifacts referenced below are retained in a private research archive
+and require authorized access. See the [local corpus examples](../README.md#use-the-existing-local-corpus)
+for running this repository's tooling against an archive at any local path.
 
 ## Groups before eligibility
 
@@ -58,7 +58,9 @@ Diagnostics keep unknown evidence visible and must never be called temporally ve
 ## Commands
 
 Commit the implementation and use new output directories. Existing v2 artifacts remain
-intact. Run LLVM and ClickHouse first; annotating other cached sources is independent.
+intact. These initial-pass examples assume local inputs in `data/` and clones/caches
+in `repos/`; neither is included in a code checkout. For the completed six-source
+results and replay example, see [06](06-six-source-validation.md).
 
 ```sh
 uv run python scripts/prepare.py enrich --repo llvm --input data/llvm/v2 --out data/llvm/v3 --offline

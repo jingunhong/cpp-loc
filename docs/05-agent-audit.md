@@ -5,6 +5,10 @@ Reviewer: **agent**, 2026-09-14. No human validation was performed. Seed:
 deduplicates selections; this is targeted coverage, not an unbiased prevalence sample.
 “Normal report” is a random report-backed case, not a promise of strict eligibility.
 
+Evidence paths below are relative to the private research archive. The underlying
+payloads and audit artifacts require authorized access and are not included in this
+public code repository.
+
 Reviewed all 20 LLVM and 18 final ClickHouse samples, plus one superseded ClickHouse
 selection. For every reviewed case, the locally cached selected payload SHA-256,
 parser output against the frozen problem statement, and raw-text hash matched.
@@ -75,7 +79,7 @@ limitations are reported rather than converted to manually curated ground truth.
 The agent inspected selected excerpts, task/kind evidence, statuses, and chronology
 for 18 systemd, 17 PostgreSQL, and 15 QEMU seeded cases. All 50 cached selected
 payload/text/raw-text hashes matched, and full-tree baseline reads reproduced each
-sample's predictions. These automated checks are recorded in the original checkout's
+sample's predictions. These automated checks are recorded in the private archive's
 `releases/six-repo-20260914/<repo>-verification.json`. No reproducer was executed,
 no human review occurred, and these judgments do not replace the frozen annotations.
 

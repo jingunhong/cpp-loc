@@ -26,28 +26,31 @@ No trainer, repair harness, or runtime sandbox is included.
 
 ## Use the existing local corpus
 
-The implementation was migrated from
-[`Cpp-SWE-bench` at `f40360c`](https://github.com/jingunhong/Cpp-SWE-bench/tree/f40360c9c49ebf128e75fe92fae73da2fc2291d8).
-That checkout retains the historical artifacts and producing commits. Its Git
-history was not imported into this repository.
+Historical corpora, raw evidence, and pre-migration implementation revisions are
+retained in a private research archive. They are not included in this GitHub
+repository or publicly downloadable. Replaying the recorded runs requires authorized
+access to those inputs; the private dataset export omits the full raw evidence.
 
-With the two repositories side by side, validate the frozen LLVM diagnostic export:
+With an authorized local copy containing `data/`, `repos/`, and `releases/`, set its
+location and validate the frozen LLVM diagnostic export:
 
 ```sh
-uv run python scripts/validate.py --runner --exact ../Cpp-SWE-bench/data/llvm/diagnostic-v2/{train,dev,test}-*.jsonl
+CPP_LOC_ARCHIVE=/path/to/local/research-archive
+uv run python scripts/validate.py --runner --exact \
+  "$CPP_LOC_ARCHIVE"/data/llvm/diagnostic-v2/{train,dev,test}-*.jsonl
 ```
 
-Prepare a new local diagnostic split from the existing evidence:
+Prepare a new local diagnostic split from the same archive:
 
 ```sh
 uv run python scripts/prepare.py split \
-  --input ../Cpp-SWE-bench/data/llvm/v3.1 \
+  --input "$CPP_LOC_ARCHIVE/data/llvm/v3.1" \
   --out data/llvm/pilot-diagnostic-v1 \
   --view diagnostic --role adaptation-candidate \
   --test-end 2026-09-09T00:00:00Z
 ```
 
-For enrichment or a baseline audit, `--repos-dir ../Cpp-SWE-bench/repos` reuses
+For enrichment or a baseline audit, `--repos-dir "$CPP_LOC_ARCHIVE/repos"` reuses
 the existing clones and caches; `--input` selects the existing corpus. The default
 `data/`, `repos/`, and `releases/` directories are ignored by Git, as are JSONL,
 Parquet, Arrow, and Git bundle files. The pre-commit large-file check limits newly
@@ -89,9 +92,10 @@ The historical and diagnostic views overlap and must not be summed as distinct b
 - [Agent review of seeded source samples](docs/05-agent-audit.md)
 - [Decision and migration history](docs/decisions.md)
 
-The historical documents' `data/`, `repos/`, and `releases/` paths describe local
-artifacts, not files tracked here. Existing manifests retain their original hashes
-and revisions; a new code repository does not change their provenance.
+The historical documents' `data/`, `repos/`, and `releases/` paths are relative to
+that private archive, not files tracked here. Pre-migration commit IDs identify
+archived provenance and may not resolve in this repository's Git history. Existing
+manifests retain their original hashes and revisions.
 
 ## License
 

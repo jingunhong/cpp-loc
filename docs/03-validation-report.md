@@ -1,8 +1,10 @@
 # 03 — Measured validation report
 
-This report records preparation in the original `Cpp-SWE-bench` checkout. Its
-producing commits and local artifacts remain there; the implementation subsequently
-moved to `cpp-loc`. See the [migration record](decisions.md#2026-09-14--code-repository-migration).
+This report records preparation before the code repository migration. Its producing
+commits and artifacts are retained in a private research archive. Artifact paths below
+are relative to that archive and require authorized access; pre-migration commit IDs
+are provenance identifiers, not public links in this repository. See the
+[migration record](decisions.md#2026-09-14--code-repository-migration).
 
 This is the **initial focused pass**, retained as a historical record. The later
 [six-source follow-up](06-six-source-validation.md) extends full Git enrichment,
@@ -225,28 +227,11 @@ The full-text review package is prepared locally at
 publication hold. It preserves historical unfiltered five-field configs and final
 companions; it has not been cleared or uploaded. The complete cache/clones are excluded.
 
-Initial filesystem and network restrictions required committing in a temporary
-checkout. After permissions were restored, the five implementation commits through
-`f40360c9c49ebf128e75fe92fae73da2fc2291d8` were restored and pushed to the original
-GitHub repository without rewriting history. Hugging Face write access was verified,
-and `jingunhong/cpp-loc` was created as an empty private dataset repository. No dataset
-files were uploaded. Delivery and recovery records remain under the original
-checkout's `releases/` directory; the remaining publication hold concerns content.
-
 ## Next LLVM pilot handoff
 
-The next local command validates the existing **provisional diagnostic** runner files:
-
-```sh
-uv run python scripts/validate.py --runner --exact data/llvm/diagnostic-v2/{train,dev,test}-*.jsonl
-```
-
-To reproduce preparation after applying the implementation commits, choose a fresh
-output directory (the frozen one is never overwritten):
-
-```sh
-uv run python scripts/prepare.py split --input data/llvm/v3.1 --out data/llvm/pilot-diagnostic-v1 --view diagnostic --role adaptation-candidate --test-end 2026-09-09T00:00:00Z
-```
+Use the [local corpus examples](../README.md#use-the-existing-local-corpus) to validate
+or prepare the **provisional diagnostic** LLVM view from authorized local inputs.
+Choose a fresh output directory; the frozen evidence is never overwritten.
 
 This does not authorize public release or certify a strict experiment. Strict yield
 needs evidence for consumed issue versions, resolution of uncached extra issue/PR
