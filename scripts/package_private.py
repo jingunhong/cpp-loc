@@ -76,16 +76,25 @@ def package(bundle: Path, out: Path) -> dict:
         if data_files:
             configs.append({"config_name": name, "data_files": data_files})
 
-    # Read evidence locally; export only source links and hashes, never raw companions.
+    # Export review metadata without copying raw messages, mail, or patches.
     sources = {}
+    groups = {}
     for path in sorted((bundle / "companions").glob("*/v*/records-*.jsonl")):
+        if path.parent not in groups:
+            grouped = json.loads((path.parent / "groups.json").read_text())
+            groups[path.parent] = (
+                grouped["membership"],
+                {g["group_id"]: g["size"] for g in grouped["groups"]},
+            )
+        membership, sizes = groups[path.parent]
         with path.open(encoding="utf-8") as file:
             for line in file:
                 row = json.loads(line)
                 inst = row["instance_id"]
                 if inst not in retained:
                     continue
-                selected = row["metadata"]["integrity"]["reports"]["selected"] or {}
+                evidence = row["metadata"]["integrity"]
+                selected = evidence["reports"]["selected"] or {}
                 source = {
                     "instance_id": inst,
                     "repo": row["repo"],
@@ -93,6 +102,15 @@ def package(bundle: Path, out: Path) -> dict:
                     "report_source": row["problem_source"],
                     "processed_text_sha256": sha256(row["problem_statement"]),
                     "payload_sha256": (selected.get("payload") or {}).get("sha256"),
+                    "group_id": membership[inst],
+                    "group_size": sizes[membership[inst]],
+                    "primary_files": evidence["git"]["primary_files"],
+                    "eligibility": {
+                        key: value
+                        for key, value in evidence["eligibility"].items()
+                        if key != "non_target_changes"
+                    },
+                    "chronology": evidence["chronology"],
                 }
                 if record_flags(source).keys() & QUARANTINE:
                     raise ValueError(f"source link requires review: {inst}")
@@ -127,7 +145,9 @@ def package(bundle: Path, out: Path) -> dict:
         "may remain. This is not anonymization or legal clearance. Counts, withheld "
         "IDs/reasons, and parent hashes are in release.json. Raw mail, patches, fixing "
         "messages, caches, and full evidence remain local.\n\n"
-        "Source links and report hashes are in provenance/. Baseline summaries describe "
+        "Source links, hashes, groups, chronology, and eligibility are in provenance/ "
+        "for controller/reviewer use only. Eligibility refers to the enriched primary "
+        "projection; unfiltered views retain historical gold. Baseline summaries describe "
         "the original populations before this storage filter. LLVM remains the "
         "adaptation candidate; other repositories are evaluation candidates.\n\n"
         "## Rights and access\n\n"

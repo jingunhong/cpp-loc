@@ -29,6 +29,13 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
     evidence = bundle / "companions/demo/v3.1"
     evidence.mkdir(parents=True)
     write_rows(evidence, "records", [ordinary])
+    write_json(
+        evidence / "groups.json",
+        {
+            "membership": {ordinary["instance_id"]: "group1"},
+            "groups": [{"group_id": "group1", "size": 1}],
+        },
+    )
     metadata = {
         "license": "other",
         "configs": [
@@ -61,6 +68,11 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
         load_rows(out / "provenance", "sources-*.jsonl")[0]["report_url"]
         == ordinary["metadata"]["report_url"]
     )
+    provenance = load_rows(out / "provenance", "sources-*.jsonl")[0]
+    assert provenance["group_id"] == "group1" and provenance["group_size"] == 1
+    assert provenance["primary_files"] == ["a.c"]
+    assert provenance["eligibility"]["strict_local"] is True
+    assert provenance["chronology"] == ordinary["metadata"]["integrity"]["chronology"]
     assert file_hashes(bundle) == before
     paths[0].write_text("changed")
     with pytest.raises(ValueError, match="bundle hash mismatch"):

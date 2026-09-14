@@ -69,3 +69,77 @@ The feature-area defect was corrected globally in `report-evidence-2`, using fro
 text/labels to create v3.1. LLVM counts did not change; ClickHouse feature/other/unknown
 and diagnostic counts did. Original v3 evidence was retained. Remaining heuristic
 limitations are reported rather than converted to manually curated ground truth.
+
+## Six-source follow-up: systemd, PostgreSQL, and QEMU
+
+The agent inspected selected excerpts, task/kind evidence, statuses, and chronology
+for 18 systemd, 17 PostgreSQL, and 15 QEMU seeded cases. All 50 cached selected
+payload/text/raw-text hashes matched, and full-tree baseline reads reproduced each
+sample's predictions. These automated checks are recorded in the original checkout's
+`releases/six-repo-20260914/<repo>-verification.json`. No reproducer was executed,
+no human review occurred, and these judgments do not replace the frozen annotations.
+
+| systemd instance | Agent judgment |
+|---|---|
+| `systemd__0688bea1631c` | JOURNAL_STREAM behavior request; unknown task can retain development work in diagnostics. |
+| `systemd__0718a21c13ef` | Explicit DNS feature request; feature and added-target exclusions are supported. |
+| `systemd__10f3f4ed016b` | Watchdog-information capability request; unknown does not establish a bug. |
+| `systemd__1ed8887e3b53` | tmpfiles regression report was created after this linked fix; chronology exclusion is necessary. |
+| `systemd__2367bdcfc901` | Boot-loader specification/documentation request; other-task exclusion is supported. |
+| `systemd__3bcc999fa555` | Firmware timing complaint shares a report; grouping remains necessary despite supported text timing. |
+| `systemd__4bf1a2c3834c` | WireGuard PublicKeyFile capability request; a diagnostic unknown, not a verified bug. |
+| `systemd__70b7e03ebbd9` | NX compatibility report; added memory-attribute header prevents existing-file eligibility. |
+| `systemd__8f2477715691` | API return-value complaint; documentation classification and added example source need care. |
+| `systemd__925095a6db67` | Flexible-array placement/compiler warning with a source hint; exact text version remains unknown. |
+| `systemd__acdba85e0e2b` | udevadm verifier RFC adds an implementation file; target-status exclusion is supported. |
+| `systemd__b3ae4e8622c0` | Network reconfiguration report is linked alongside other reports; labels remain ambiguous. |
+| `systemd__bf1b9ae487b6` | WakeSystem user-unit capability request illustrates development work among unknown tasks. |
+| `systemd__bf478dcffbc3` | Boot-time resolver failure with bug evidence; version chronology is still unresolved. |
+| `systemd__e09402326c3d` | Comparator-transitivity report contains precise source context; extra references remain unresolved. |
+| `systemd__e3b84b105e63` | repart hardlink-leak report passes local strict rules; this does not establish future-test eligibility. |
+| `systemd__ea583ed5a366` | Xen detection regression with an explicit source link; bug evidence does not certify consumed text timing. |
+| `systemd__f7725647bb41` | Concurrent portable-service image conflict; exact consumed text version remains unknown. |
+
+| PostgreSQL instance | Agent judgment |
+|---|---|
+| `postgres__2214a207ee81` | Inline documentation patch submission; excluded from original-report tasks. |
+| `postgres__274bbced8538` | TLS ticket traffic observation; ordinary-message classification is conservative. |
+| `postgres__28d3c2ddcf91` | GiST wrong-results bug form; report form does not supply missing timezone evidence. |
+| `postgres__2cf212db5286` | Reply about Unicode safety/Coverity; added target and reply context remain visible. |
+| `postgres__346fbdcc2a92` | pg_surgery infinite-loop bug form; original-message timestamp remains unresolved. |
+| `postgres__3a8a1f3254b2` | SQL/JSON patch-thread reply about comments; not verified as an original bug report. |
+| `postgres__3e83bdd35a5f` | aarch64 compilation failure looks defect-like but remains task-unknown under current rules. |
+| `postgres__47c0accbe05b` | Serializable-transaction assertion shares a report; group restrictions are warranted. |
+| `postgres__56d23855c864` | Postmaster cleanup reply reports an uninitialized name; thread timing is not consumed-message timing. |
+| `postgres__7afa11feca6c` | Bug-plus-patch submission for property graphs; explicit patch context excludes it. |
+| `postgres__843e50208a31` | Index-scan assertion bug form; chronology remains unknown. |
+| `postgres__905e44152a1d` | Collation behavior discussion with multiple linked reports; whole-change attribution is ambiguous. |
+| `postgres__b738f7b67967` | OAuth integer-overflow discussion is defect-like; unknown is a heuristic false negative. |
+| `postgres__e92c0632c147` | GSSAPI/OpenSSL reply proposes a new shared header; added-target exclusion is supported. |
+| `postgres__ebf6c5249b7d` | Query-ID regression-test noise; uncached extra references remain unresolved. |
+| `postgres__f24523672de9` | Trigger memory-leak report is defect-like despite ordinary/unknown annotations. |
+| `postgres__fa06a34d14ea` | Collation-upgrade reply points to a version-check error; reply provenance stays unresolved. |
+
+| QEMU instance | Agent judgment |
+|---|---|
+| `qemu__0969e00b3933` | m68k segfault with backtrace; current task heuristic misses defect evidence. |
+| `qemu__0c201cc17fef` | FSF license-notice address maintenance; other-task exclusion is appropriate. |
+| `qemu__1e0c544673f4` | Windows monitor arrow-key malfunction; exact consumed text version is unknown. |
+| `qemu__20ab88a9066b` | ast2600 boot failure with commands; unknown classification is conservative. |
+| `qemu__32ba75adc009` | Missing plugin documentation; other-task exclusion is supported. |
+| `qemu__333e7599a0d7` | VNC regression shares a report across fixes; grouping is necessary. |
+| `qemu__40a205da415e` | Usermode CPU-feature warnings; task remains unknown rather than assumed bug. |
+| `qemu__78255ce392dc` | aarch64/KVM missing-property failure; defect-like content remains unknown. |
+| `qemu__a1367443bac7` | Missing VDSO behavior requires added targets; existing-file exclusion is supported. |
+| `qemu__a8e63ff289d1` | macOS VM regression with multiple linked reports; labels remain ambiguous. |
+| `qemu__bd64c210ce2b` | MIPS snapshot segfault has bug evidence; consumed text timing remains unknown. |
+| `qemu__c9bc9f57ffba` | M-profile helper alignment issue has bug evidence; chronology is not independently certified. |
+| `qemu__d44971e725c0` | nanoMIPS semihosting freeze exceeds the projected primary-file limit. |
+| `qemu__e6c33efed3ca` | Generalizing ivshmem is a capability request with added targets; exclusion is supported. |
+| `qemu__e73b8bb8a3e9` | Incorrect MPU region count has bug evidence; it is not a verified temporal test by itself. |
+
+Systemd feature-request forms and several PostgreSQL/QEMU defect descriptions expose
+known false negatives in the conservative task heuristics. Diagnostics intentionally
+retain unknowns, so their counts must not be described as verified bugs. Public release
+also needs review of names, obfuscated contact details, and embedded third-party notices;
+the private storage screen is not a replacement for that review.
