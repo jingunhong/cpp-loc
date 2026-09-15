@@ -465,6 +465,29 @@ def test_half_open_cutoffs_unknown_times_and_explicit_end():
         splits.config(test_end="2026-09-01")
 
 
+def test_training_minimum_is_enforced_after_iterative_dev_quarantine():
+    rows = [candidate(str(i), f"2025-01-{i:02d}T00:00:00Z", str(i)) for i in range(1, 7)]
+    rows.append(candidate("test", "2026-07-01T00:00:00Z", "test"))
+    splits.evidence(rows[2])["reports"] = copy.deepcopy(splits.evidence(rows[5])["reports"])
+    grouped = splits.groups(rows)
+    cfg = splits.config(
+        test_end="2026-09-09T00:00:00Z", view="diagnostic", dev_size=2, min_train_size=3
+    )
+    result = splits.split(rows, grouped, cfg)
+    assert result["status"] == "refused"
+    assert result["eligible_before_train_dev"]["pool"] == 6
+    assert result["eligible_before_dev"] == {"pool": 4, "test": 1}
+    assert (
+        result["refusal"]
+        == "need 2 dev records plus at least 3 training records; only 4 eligible pool records"
+    )
+    assert result["counts"] == {"excluded": 7}
+    accepted = splits.split(rows, grouped, {**cfg, "min_train_size": 2})
+    assert accepted["counts"] == {"train": 2, "dev": 2, "excluded": 2, "test": 1}
+    with pytest.raises(ValueError, match="min_train_size must be positive"):
+        splits.config(test_end=cfg["test_end"], min_train_size=0)
+
+
 def test_baseline_is_gold_blind_keeps_incorrect_predictions_and_failures():
     tree = ["src/io.c", "src/stdio.c", "src/a.cpp", "else/a.cpp", "tests/test.c"]
     text = "see /build/project/src/io.c:123 and src/stdio.c:4; a.cpp; tests/test.c"

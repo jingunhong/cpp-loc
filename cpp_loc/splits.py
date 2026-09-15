@@ -11,6 +11,7 @@ DEFAULTS = {
     "buffer_start": "2026-03-01T00:00:00Z",
     "test_start": "2026-06-01T00:00:00Z",
     "dev_size": 300,
+    "min_train_size": 1,
 }
 
 
@@ -109,6 +110,8 @@ def config(
         raise ValueError("cutoffs must be strictly increasing explicit timezone-aware timestamps")
     if cfg["dev_size"] < 1:
         raise ValueError("dev_size must be positive")
+    if cfg["min_train_size"] < 1:
+        raise ValueError("min_train_size must be positive")
     if role not in {"adaptation-candidate", "provisional-transfer-evaluation", "evaluation-only"}:
         raise ValueError("unknown source/target role")
     if view not in {"strict", "diagnostic"}:
@@ -167,13 +170,20 @@ def split(rows: list[dict], grouped: dict, cfg: dict) -> dict:
                 candidates[part].append(inst)
     refused = None
     pool = candidates["pool"]
+    eligible_before_train_dev = len(pool)
+    min_train_size = cfg.get("min_train_size", 1)
     dev = []
     if cfg["role"] == "adaptation-candidate":
         while True:
             pool.sort(key=lambda i: (utc(evidence(by_id[i])["git"]["committer_at"]), i))
-            if len(pool) <= cfg["dev_size"]:
+            if len(pool) < cfg["dev_size"] + min_train_size:
+                minimum = (
+                    "nonempty training"
+                    if min_train_size == 1
+                    else f"at least {min_train_size} training records"
+                )
                 refused = (
-                    f"need {cfg['dev_size']} dev records plus nonempty training; "
+                    f"need {cfg['dev_size']} dev records plus {minimum}; "
                     f"only {len(pool)} eligible pool records"
                 )
                 break
@@ -205,6 +215,7 @@ def split(rows: list[dict], grouped: dict, cfg: dict) -> dict:
         else ("strict-candidate" if cfg["view"] == "strict" else "provisional-diagnostic"),
         "refusal": refused,
         "counts": counts,
+        "eligible_before_train_dev": {"pool": eligible_before_train_dev},
         "eligible_before_dev": {"pool": len(pool), "test": len(candidates["test"])},
         "exclusion_counts": dict(
             sorted(Counter(reason for a in assignments.values() for reason in a["reasons"]).items())

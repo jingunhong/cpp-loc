@@ -65,6 +65,10 @@ def package(bundle: Path, out: Path) -> dict:
                             retained.add(inst)
                             rows.append(row)
             split = part["split"]
+            if "_adaptation_" in name and excluded:
+                raise ValueError(
+                    f"screen would change frozen adaptation membership: {name}/{split}"
+                )
             if not normalized_path(split) or "/" in split:
                 raise ValueError("invalid split name")
             paths = write_rows(destination, split, rows)
@@ -122,6 +126,8 @@ def package(bundle: Path, out: Path) -> dict:
     write_rows(provenance, "sources", (sources[k] for k in sorted(sources)))
     for path in sorted((bundle / "companions").glob("*/baseline-v1/summary.json")):
         shutil.copyfile(path, provenance / f"{path.parent.parent.name}-baseline.json")
+    for path in sorted((bundle / "companions").glob("*/adaptation-*-v*/manifest.json")):
+        shutil.copyfile(path, provenance / f"{path.parent.parent.name}-{path.parent.name}.json")
 
     metadata.update(
         configs=configs,
@@ -149,8 +155,10 @@ def package(bundle: Path, out: Path) -> dict:
         "Source links, hashes, groups, chronology, and eligibility are in provenance/ "
         "for controller/reviewer use only. Eligibility refers to the enriched primary "
         "projection; unfiltered views retain historical gold. Baseline summaries describe "
-        "the original populations before this storage filter. LLVM remains the "
-        "adaptation candidate; other repositories are evaluation candidates.\n\n"
+        "the original populations before this storage filter. Versioned `*_adaptation_*` "
+        "configurations add feasible train/dev/test views using enriched gold; the existing "
+        "evaluation configurations remain available. Refused attempts and full assignment "
+        "manifests are retained under provenance/. Diagnostics remain provisional.\n\n"
         "## Rights and access\n\n"
         "The implementation is MIT. This snapshot supplies no blanket license for "
         "upstream reports or embedded code; existing notices are preserved in retained "

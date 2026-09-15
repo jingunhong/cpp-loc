@@ -1,4 +1,5 @@
 import json
+from types import SimpleNamespace
 
 import pytest
 
@@ -81,3 +82,71 @@ def test_private_bundle_quarantines_all_fields_and_keeps_raw_evidence_local(tmp_
         package_private.package(bundle, tmp_path / "corrupt")
     with pytest.raises(ValueError, match="invalid bundle path"):
         package_private.contained(bundle, "../escape")
+
+
+def test_versioned_adaptations_are_additive_and_keep_refusals(tmp_path, monkeypatch):
+    from cpp_loc import splits
+    from scripts import adapt, prepare
+
+    monkeypatch.setattr(prepare, "implementation", lambda: {"revision": "committed"})
+    monkeypatch.setattr(package_private, "implementation", lambda: {"revision": "committed"})
+    monkeypatch.setattr(prepare, "REPOS", {"demo": {}})
+    data, adaptations = tmp_path / "data", tmp_path / "adaptations"
+    source = data / "demo/v3.1"
+    source.mkdir(parents=True)
+    rows = [candidate(str(i), f"2025-01-0{i}T00:00:00Z", str(i)) for i in range(1, 4)]
+    rows.append(candidate("future", "2026-07-01T00:00:00Z", "future"))
+    for row in rows:
+        row["file_changes"] = [{"file": "historical.c"}]
+    grouped = splits.groups(rows)
+    write_rows(source, "records", rows)
+    write_json(source / "groups.json", grouped)
+    write_json(source / "snapshot.json", {})
+    write_json(source / "manifest.json", {"output_hashes": file_hashes(source)})
+    historical = data / "demo/v2"
+    historical.mkdir()
+    write_rows(historical, "instances", rows)
+    cfg = splits.config(**adapt.SCHEDULE, view="diagnostic", dev_size=2)
+    frozen = data / "demo/diagnostic-v2"
+    prepare.prepare_split(source, frozen, {**cfg, "role": "evaluation-only"})
+    added = adaptations / "demo/adaptation-diagnostic-v1"
+    result = prepare.prepare_split(source, added, cfg)
+    adapt.validate_split(rows, grouped, result, added, frozen)
+    refused = adaptations / "demo/adaptation-strict-v1"
+    result = prepare.prepare_split(source, refused, {**cfg, "view": "strict", "dev_size": 300})
+    assert result["status"] == "refused"
+    adapt.validate_split(rows, grouped, result, refused, frozen)
+    before = file_hashes(data)
+    bundle, private = tmp_path / "bundle", tmp_path / "private"
+    prepare.package_command(SimpleNamespace(data_dir=data, adaptation_dir=adaptations, out=bundle))
+    package_private.package(bundle, private)
+    card = json.loads((private / "README.md").read_text().split("---", 2)[1])
+    assert [c["config_name"] for c in card["configs"]] == [
+        "demo_unfiltered",
+        "demo_diagnostic",
+        "demo_adaptation_diagnostic_v1",
+    ]
+    for name in ("demo_diagnostic", "demo_adaptation_diagnostic_v1"):
+        assert (private / "data" / name / "test-000.jsonl").read_bytes() == (
+            frozen / "test-000.jsonl"
+        ).read_bytes()
+    train = load_rows(private / "data/demo_adaptation_diagnostic_v1", "train-*.jsonl")
+    assert train[0]["file_changes"] == [{"file": "a.c"}]
+    assert load_rows(private / "data/demo_unfiltered", "*.jsonl")[0]["file_changes"] == [
+        {"file": "historical.c"}
+    ]
+    assert (
+        json.loads((private / "provenance/demo-adaptation-strict-v1.json").read_text())["status"]
+        == "refused"
+    )
+    assert file_hashes(data) == before
+
+    # Storage screening cannot silently shrink a versioned adaptation.
+    paths = sorted((bundle / "companions/demo/adaptation-diagnostic-v1").glob("train-*.jsonl"))
+    train[0]["problem_statement"] = "Phone: +1 202 555 0100"
+    paths[0].write_text(json.dumps(train[0]) + "\n")
+    hashes = file_hashes(bundle)
+    hashes.pop("release.json")
+    write_json(bundle / "release.json", {"output_hashes": hashes})
+    with pytest.raises(ValueError, match="screen would change frozen adaptation membership"):
+        package_private.package(bundle, tmp_path / "screen-refused")

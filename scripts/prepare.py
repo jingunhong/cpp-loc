@@ -282,31 +282,36 @@ def reclassify_command(args) -> None:
     print(json.dumps(audit.population_summary(rows, grouped), indent=2))
 
 
-def split_command(args) -> None:
-    implementation()
-    verify_manifest(args.input)
-    rows = load_rows(args.input, "records-*.jsonl")
-    grouped = json.loads((args.input / "groups.json").read_text())
-    cfg = splits.config(
-        test_end=args.test_end,
-        role=args.role,
-        view=args.view,
-        **{k: getattr(args, k) for k in splits.DEFAULTS},
-    )
+def prepare_split(source: Path, out: Path, cfg: dict) -> dict:
+    code = implementation()
+    verify_manifest(source)
+    rows = load_rows(source, "records-*.jsonl")
+    grouped = json.loads((source / "groups.json").read_text())
     result = splits.split(rows, grouped, cfg)
-    fresh(args.out)
-    result["input_hashes"] = file_hashes(args.input)
-    result["implementation"] = implementation()
-    result["input_snapshot"] = json.loads((args.input / "snapshot.json").read_text())
+    fresh(out)
+    result["input_hashes"] = file_hashes(source)
+    result["implementation"] = code
+    result["input_snapshot"] = json.loads((source / "snapshot.json").read_text())
     for part in ("train", "dev", "test"):
         selected = [
             runner_row(r)
             for r in rows
             if result["membership"][r["instance_id"]]["partition"] == part
         ]
-        write_rows(args.out, part, selected)
-    result["output_hashes"] = file_hashes(args.out)
-    write_json(args.out / "manifest.json", result)
+        write_rows(out, part, selected)
+    result["output_hashes"] = file_hashes(out)
+    write_json(out / "manifest.json", result)
+    return result
+
+
+def split_command(args) -> None:
+    cfg = splits.config(
+        test_end=args.test_end,
+        role=args.role,
+        view=args.view,
+        **{k: getattr(args, k) for k in splits.DEFAULTS},
+    )
+    result = prepare_split(args.input, args.out, cfg)
     print(
         json.dumps(
             {
@@ -370,6 +375,8 @@ def audit_command(args) -> None:
 
 def package_command(args) -> None:
     code = implementation()
+    if args.adaptation_dir and not args.adaptation_dir.is_dir():
+        raise ValueError(f"missing adaptation directory: {args.adaptation_dir}")
     fresh(args.out)
     configs, counts = [], {}
     for name in sorted(REPOS):
@@ -392,20 +399,27 @@ def package_command(args) -> None:
             f"{kind}-v2" if (args.data_dir / name / f"{kind}-v2").is_dir() else f"{kind}-v1"
             for kind in ("splits", "diagnostic")
         ]
+        split_sources = [args.data_dir / name / folder for folder in split_dirs]
+        if args.adaptation_dir:
+            split_sources += sorted((args.adaptation_dir / name).glob("adaptation-*-v*"))
         # Retain the final evidence/partitions; superseded candidates stay local.
-        for folder in (evidence_dir, *split_dirs, "baseline-v1"):
-            source = args.data_dir / name / folder
+        for source in (
+            args.data_dir / name / evidence_dir,
+            *split_sources,
+            args.data_dir / name / "baseline-v1",
+        ):
             if source.is_dir():
                 verify_manifest(source)
-                shutil.copytree(source, args.out / "companions" / name / folder)
-        for folder in split_dirs:
-            split_dir = args.data_dir / name / folder
+                shutil.copytree(source, args.out / "companions" / name / source.name)
+        for split_dir in split_sources:
             if not split_dir.is_dir():
                 continue
             manifest = json.loads((split_dir / "manifest.json").read_text())
             data_files = []
             for part in ("train", "dev", "test"):
-                paths = sorted((args.out / "companions" / name / folder).glob(f"{part}-*.jsonl"))
+                paths = sorted(
+                    (args.out / "companions" / name / split_dir.name).glob(f"{part}-*.jsonl")
+                )
                 if paths:
                     data_files.append(
                         {"split": part, "path": [p.relative_to(args.out).as_posix() for p in paths]}
@@ -413,7 +427,13 @@ def package_command(args) -> None:
             if data_files:
                 configs.append(
                     {
-                        "config_name": name + "_" + manifest["config"]["view"],
+                        "config_name": name
+                        + "_"
+                        + (
+                            split_dir.name.replace("-", "_")
+                            if split_dir.name.startswith("adaptation-")
+                            else manifest["config"]["view"]
+                        ),
                         "data_files": data_files,
                     }
                 )
@@ -458,6 +478,12 @@ def package_command(args) -> None:
         "`problem_statement`, `file_changes`. The last field is evaluator-only gold. "
         "Model-visible input is report text plus opaque workspace context, never the "
         "serialized row. The exporter does not provide a sandbox.\n\n"
+    )
+    card += (
+        "Versioned `*_adaptation_*` configurations, when present, add train/dev/test "
+        "views without replacing the frozen evaluation configurations. Refused primary "
+        "and small-data attempts remain in companion manifests. All adaptation labels "
+        "use the enriched implementation-file projection.\n\n"
     )
     card += (
         "LLVM is the first adaptation candidate; ClickHouse remains a provisional "
@@ -519,10 +545,11 @@ def main() -> None:
                 cmd.add_argument(
                     "--" + key.replace("_", "-"),
                     default=default,
-                    type=int if key == "dev_size" else str,
+                    type=int if isinstance(default, int) else str,
                 )
         elif name == "package":
             cmd.add_argument("--data-dir", type=Path, default=Path("data"))
+            cmd.add_argument("--adaptation-dir", type=Path, help="add versioned adaptation views")
     args = parser.parse_args()
     try:
         {
