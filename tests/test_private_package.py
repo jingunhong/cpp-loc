@@ -106,7 +106,7 @@ def test_versioned_adaptations_are_additive_and_keep_refusals(tmp_path, monkeypa
     historical = data / "demo/v2"
     historical.mkdir()
     write_rows(historical, "instances", rows)
-    cfg = splits.config(**adapt.SCHEDULE, view="diagnostic", dev_size=2)
+    cfg = splits.config(**adapt.SCHEDULE, view="diagnostic", dev_size=1)
     frozen = data / "demo/diagnostic-v2"
     prepare.prepare_split(source, frozen, {**cfg, "role": "evaluation-only"})
     added = adaptations / "demo/adaptation-diagnostic-v1"
@@ -141,12 +141,25 @@ def test_versioned_adaptations_are_additive_and_keep_refusals(tmp_path, monkeypa
     )
     assert file_hashes(data) == before
 
-    # Storage screening cannot silently shrink a versioned adaptation.
+    # Storage can withhold training rows, explicitly counted, while retaining the minimum.
     paths = sorted((bundle / "companions/demo/adaptation-diagnostic-v1").glob("train-*.jsonl"))
     train[0]["problem_statement"] = "Phone: +1 202 555 0100"
-    paths[0].write_text(json.dumps(train[0]) + "\n")
+    paths[0].write_text("".join(json.dumps(row) + "\n" for row in train))
     hashes = file_hashes(bundle)
     hashes.pop("release.json")
     write_json(bundle / "release.json", {"output_hashes": hashes})
-    with pytest.raises(ValueError, match="screen would change frozen adaptation membership"):
-        package_private.package(bundle, tmp_path / "screen-refused")
+    screened = package_private.package(bundle, tmp_path / "screened")
+    assert screened["counts"]["demo_adaptation_diagnostic_v1"]["train"] == {
+        "included": 1,
+        "withheld": 1,
+    }
+    # Dropping below the train minimum or dropping any dev/test row refuses storage.
+    for path in [paths[0], paths[0].with_name("dev-000.jsonl")]:
+        original = path.read_bytes()
+        path.write_text(json.dumps(train[0]) + "\n")
+        hashes = file_hashes(bundle)
+        hashes.pop("release.json")
+        write_json(bundle / "release.json", {"output_hashes": hashes})
+        with pytest.raises(ValueError, match="screen would violate adaptation split constraints"):
+            package_private.package(bundle, tmp_path / ("screen-refused-" + path.stem))
+        path.write_bytes(original)

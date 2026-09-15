@@ -43,6 +43,10 @@ def package(bundle: Path, out: Path) -> dict:
     counts, withheld, screened, retained, configs = {}, {}, {}, set(), []
     for config in metadata["configs"]:
         name = config["config_name"]
+        adaptation = None
+        if "_adaptation_" in name:
+            source = contained(bundle, config["data_files"][0]["path"][0]).parent
+            adaptation = json.loads((source / "manifest.json").read_text())
         destination = contained(out, "data/" + name)
         destination.mkdir(parents=True)
         data_files, counts[name] = [], {}
@@ -65,10 +69,12 @@ def package(bundle: Path, out: Path) -> dict:
                             retained.add(inst)
                             rows.append(row)
             split = part["split"]
-            if "_adaptation_" in name and excluded:
-                raise ValueError(
-                    f"screen would change frozen adaptation membership: {name}/{split}"
-                )
+            if adaptation and excluded:
+                minimum = adaptation["config"].get("min_train_size", 1)
+                if split != "train" or len(rows) < minimum:
+                    raise ValueError(
+                        f"screen would violate adaptation split constraints: {name}/{split}"
+                    )
             if not normalized_path(split) or "/" in split:
                 raise ValueError("invalid split name")
             paths = write_rows(destination, split, rows)
@@ -159,6 +165,10 @@ def package(bundle: Path, out: Path) -> dict:
         "configurations add feasible train/dev/test views using enriched gold; the existing "
         "evaluation configurations remain available. Refused attempts and full assignment "
         "manifests are retained under provenance/. Diagnostics remain provisional.\n\n"
+        "Adaptation manifests describe the full local splits; release.json records "
+        "storage counts and withheld IDs. Storage screening may withhold training rows "
+        "while retaining the recorded minimum train size; it never changes adaptation "
+        "dev/test membership. Retained text and gold are unchanged.\n\n"
         "## Rights and access\n\n"
         "The implementation is MIT. This snapshot supplies no blanket license for "
         "upstream reports or embedded code; existing notices are preserved in retained "
