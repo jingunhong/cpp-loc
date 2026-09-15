@@ -160,7 +160,7 @@ def generate(archive: Path, out: Path):
         check(not originals, f"missing original records: {name}")
         grouped = json.loads((source / "groups.json").read_text())
         check(
-            json_bytes(splits.groups(rows)) == json_bytes(grouped),
+            json.loads(json_bytes(splits.groups(rows))) == grouped,
             f"frozen grouping differs: {name}",
         )
         outcomes = {}
