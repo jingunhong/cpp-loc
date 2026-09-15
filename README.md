@@ -84,10 +84,19 @@ unique report-backed instances. None of those five appears in the diagnostic or
 strict splits above.
 The historical and diagnostic views overlap and must not be summed as distinct bugs.
 
+Additional versioned adaptation splits are now prepared locally: Linux, PostgreSQL,
+and systemd support the primary 300-row dev configuration; QEMU supports an explicit
+50-row dev pilot. ClickHouse remains evaluation-only with just 127 eligible historical
+pool records. Linux also supports strict adaptation candidates. Frozen LLVM and all
+existing tests are unchanged. See [measured yields, artifact paths, and training
+commands](docs/07-repository-adaptation.md). The additive HF package is local;
+these new configurations have not been uploaded.
+
 - [Integrity and evidence rules](docs/01-dataset-integrity.md)
 - [Grouping, temporal splits, and runner handoff](docs/02-splits-and-provenance.md)
 - [Measured validation and exclusion counts](docs/03-validation-report.md)
 - [Full six-source follow-up and private review export](docs/06-six-source-validation.md)
+- [Additional repository adaptations and training handoff](docs/07-repository-adaptation.md)
 - [Publication review and remaining work](docs/04-publication-review.md)
 - [Agent review of seeded source samples](docs/05-agent-audit.md)
 - [Decision and migration history](docs/decisions.md)

@@ -378,3 +378,15 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   public documentation. Use `CPP_LOC_ARCHIVE` for local replay examples and state
   that the raw evidence and pre-migration revisions require authorized archive access.
   Preserve recorded hashes, measured results, and frozen artifacts.
+
+## 2026-09-15 — additional adaptation configurations
+
+- Assess the five existing non-LLVM populations using frozen v3.1 evidence and the
+  existing temporal/group rules. Preserve primary refusals; attempt the requested
+  dev=50/minimum-train=100 diagnostic alternative only where primary dev=300 fails.
+  Results and training paths are in [07](07-repository-adaptation.md).
+- Preserve all existing evaluation views and prepare additive local HF configurations.
+  Keep canonical local splits intact; the existing storage screen withholds one Linux
+  and one PostgreSQL training row. Record those storage subsets separately, enforce
+  minimum training counts, and refuse any adaptation dev/test loss. No upload or
+  visibility change is part of this preparation.
