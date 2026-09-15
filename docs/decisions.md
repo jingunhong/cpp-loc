@@ -388,5 +388,9 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
 - Preserve all existing evaluation views and prepare additive local HF configurations.
   Keep canonical local splits intact; the existing storage screen withholds one Linux
   and one PostgreSQL training row. Record those storage subsets separately, enforce
-  minimum training counts, and refuse any adaptation dev/test loss. No upload or
-  visibility change is part of this preparation.
+  minimum training counts, and refuse any adaptation dev/test loss. The initial
+  preparation performed no upload or visibility change.
+- On the user's follow-up push authorization, push the implementation/documentation
+  to GitHub main and upload the reviewed additive package to the existing private HF
+  repository. Verify remote content identities, preserved configuration definitions,
+  authenticated loading of all five new views, and unchanged private visibility.

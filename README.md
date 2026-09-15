@@ -89,8 +89,9 @@ and systemd support the primary 300-row dev configuration; QEMU supports an expl
 50-row dev pilot. ClickHouse remains evaluation-only with just 127 eligible historical
 pool records. Linux also supports strict adaptation candidates. Frozen LLVM and all
 existing tests are unchanged. See [measured yields, artifact paths, and training
-commands](docs/07-repository-adaptation.md). The additive HF package is local;
-these new configurations have not been uploaded.
+commands](docs/07-repository-adaptation.md). The five new configurations are available
+in the existing private [Hugging Face dataset](https://huggingface.co/datasets/jingunhong/cpp-loc)
+at revision `dba1ad344421bb9ed36563aa0ecfc11e854694fa`.
 
 - [Integrity and evidence rules](docs/01-dataset-integrity.md)
 - [Grouping, temporal splits, and runner handoff](docs/02-splits-and-provenance.md)

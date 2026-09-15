@@ -3,9 +3,9 @@
 Generated locally on 2026-09-15 from the authorized `../Cpp-SWE-bench/` archive.
 These are measured split outcomes, not training runs. All five repositories were
 assessed; feasible views are separately named and versioned. LLVM and every existing
-evaluation configuration retain their frozen data. The Hub remains at private
-revision `528bffec7602b48d4ad4687d5735a61af8a7718c`; the additive package is local,
-not uploaded.
+evaluation configuration retain their frozen data. Following the user's push
+authorization, the additive package was uploaded to the existing private Hub
+repository at revision `dba1ad344421bb9ed36563aa0ecfc11e854694fa`.
 
 ## Yield and recommended use
 
@@ -106,7 +106,7 @@ New nonempty HF configuration names are `linux_adaptation_diagnostic_v1`,
 `linux_adaptation_strict_v1`, `postgres_adaptation_diagnostic_v1`,
 `systemd_adaptation_diagnostic_v1`, and `qemu_adaptation_diagnostic_small_v1`.
 Each has `train`, `dev`, and `test`. The 13 existing configurations remain available.
-These new names are prepared locally and are not yet available from the Hub.
+These names are available locally and from the pinned private Hub revision above.
 
 For example, the training agent can validate and load Linux directly:
 
@@ -189,3 +189,36 @@ SHA-256 anchors (individual shard hashes are in the manifests):
 
 The full-review bundle contains the documentation snapshot from its generation;
 this document additionally records the subsequent storage screen and validation.
+
+## Verified private delivery
+
+Uploaded on 2026-09-15 to
+[`jingunhong/cpp-loc` at `dba1ad3`](https://huggingface.co/datasets/jingunhong/cpp-loc/commit/dba1ad344421bb9ed36563aa0ecfc11e854694fa).
+The repository was private before and after upload. All 51 package files match
+the Hub's content identities (LFS SHA-256 or Git blob hashes); the only additional
+remote file is the pre-existing `.gitattributes`. All 13 prior configuration
+definitions are preserved, and all five new configurations loaded with authenticated
+`datasets` access at this revision, reproducing the local storage rows exactly.
+Local receipts are `releases/adaptation-v1-hf-{upload,delivery}.json`.
+
+Executed upload command:
+
+```sh
+hf upload jingunhong/cpp-loc releases/cpp-loc-adaptation-private-v1 . \
+  --type dataset --revision main \
+  --commit-message 'Add versioned repository adaptation configurations' --format json
+```
+
+The training agent can use the pinned storage configuration with its authorized HF
+credentials (Linux diagnostic storage train/dev/test: 2,456 / 300 / 382):
+
+```python
+from datasets import load_dataset
+
+data = load_dataset(
+    "jingunhong/cpp-loc",
+    "linux_adaptation_diagnostic_v1",
+    revision="dba1ad344421bb9ed36563aa0ecfc11e854694fa",
+    token=True,
+)
+```
