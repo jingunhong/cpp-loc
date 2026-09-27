@@ -1,6 +1,7 @@
 # 07 — Additional repository adaptation splits
 
-Generated locally on 2026-09-15 from the authorized `../Cpp-SWE-bench/` archive.
+Generated locally on 2026-09-15 from the authorized `../Cpp-SWE-bench/` archive
+(now archived on the Hub; see [Reproduction and validation](#reproduction-and-validation)).
 These are measured split outcomes, not training runs. All five repositories were
 assessed; feasible views are separately named and versioned. LLVM and every existing
 evaluation configuration retain their frozen data. Following the user's push
@@ -136,6 +137,20 @@ Its file hashes, archive revision, frozen enrichment implementations/snapshots a
 pinned upstream revisions are retained in the receipts/manifests. Byte-identical
 manifest replay requires this code revision; later documentation-only commits
 change the recorded revision even if runner bytes match.
+
+The local `../Cpp-SWE-bench/` checkout was deleted on 2026-09-27. Its gitignored
+`data/`, `releases/` and `repos/cache/` are archived byte-for-byte in the private Hub
+dataset `jingunhong/Cpp-SWE-bench-archive` (checksums in its `MANIFEST.sha256`).
+Restore it before running the commands below; tracked inputs such as `data/*/v2`
+and the git revision come from the clone:
+
+```sh
+git clone git@github.com:jingunhong/Cpp-SWE-bench.git ../Cpp-SWE-bench
+git -C ../Cpp-SWE-bench checkout f40360c9c49ebf128e75fe92fae73da2fc2291d8
+hf download jingunhong/Cpp-SWE-bench-archive --type dataset --local-dir ../Cpp-SWE-bench \
+  --include "data/*" --include "releases/*" --include repos-cache.tar.gz --include MANIFEST.sha256
+(cd ../Cpp-SWE-bench && tar -xzf repos-cache.tar.gz && shasum -a 256 -c MANIFEST.sha256 --quiet)
+```
 
 Executed generation and packaging commands:
 
