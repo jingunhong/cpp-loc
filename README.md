@@ -31,6 +31,18 @@ retained in a private research archive. They are not included in this GitHub
 repository or publicly downloadable. Replaying the recorded runs requires authorized
 access to those inputs; the private dataset export omits the full raw evidence.
 
+Both local stores are archived byte-for-byte in private Hub datasets, each with a
+`MANIFEST.sha256`: the research archive in `jingunhong/Cpp-SWE-bench-archive`
+(restore steps in [07](docs/07-repository-adaptation.md#reproduction-and-validation)),
+and this checkout's gitignored `data/` and `releases/` in `jingunhong/cpp-loc-archive`.
+Restore the latter at the clone root:
+
+```sh
+hf download jingunhong/cpp-loc-archive --type dataset --local-dir . \
+  --include "data/*" --include "releases/*" --include MANIFEST.sha256
+shasum -a 256 -c MANIFEST.sha256 --quiet
+```
+
 With an authorized local copy containing `data/`, `repos/`, and `releases/`, set its
 location and validate the frozen LLVM diagnostic export:
 
