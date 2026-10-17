@@ -394,3 +394,14 @@ Survey (git-side funnel only, instances = 1–5 gold files; issue repos since 20
   to GitHub main and upload the reviewed additive package to the existing private HF
   repository. Verify remote content identities, preserved configuration definitions,
   authenticated loading of all five new views, and unchanged private visibility.
+
+## 2026-10-17 — local checkout archive
+
+- Before the owner deletes this clone, archive its gitignored `data/` and `releases/`
+  byte-for-byte to the private Hub dataset `jingunhong/cpp-loc-archive`, mirroring
+  `jingunhong/Cpp-SWE-bench-archive`. 19 of 240 files existed nowhere else, including
+  the canonical Linux/PostgreSQL adaptation training shards with the two screened rows,
+  so the archive stays private.
+- Keep `releases/{verify-adaptation-package,review-adaptation-readiness}-v1.py` verbatim
+  in that archive rather than committing them: they are release receipts with
+  hardcoded local paths and revisions, and formatting hooks would alter what ran.

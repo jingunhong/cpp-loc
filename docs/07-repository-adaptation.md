@@ -152,6 +152,17 @@ hf download jingunhong/Cpp-SWE-bench-archive --type dataset --local-dir ../Cpp-S
 (cd ../Cpp-SWE-bench && tar -xzf repos-cache.tar.gz && shasum -a 256 -c MANIFEST.sha256 --quiet)
 ```
 
+This checkout's gitignored `data/` and `releases/` (all `data/adaptation-v1*` and
+`releases/*` paths in this document) were likewise archived byte-for-byte on
+2026-10-17 in the private Hub dataset `jingunhong/cpp-loc-archive` before its local
+clone was deleted. Restore them at the clone root:
+
+```sh
+hf download jingunhong/cpp-loc-archive --type dataset --local-dir . \
+  --include "data/*" --include "releases/*" --include MANIFEST.sha256
+shasum -a 256 -c MANIFEST.sha256 --quiet
+```
+
 Executed generation and packaging commands:
 
 ```sh
